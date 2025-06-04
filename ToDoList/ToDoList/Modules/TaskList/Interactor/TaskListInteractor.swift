@@ -8,9 +8,9 @@
 import Foundation
 
 protocol TaskListInteractorProtocol {
-    func fetchTasks() -> [TaskEntity]
+    func fetchTasks() -> [Task]
     func addTask(title: String)
-    func toggleTask(_ task: TaskEntity)
+    func toggleTask(id: UUID)
 }
 
 final class TaskListInteractor: TaskListInteractorProtocol {
@@ -20,15 +20,15 @@ final class TaskListInteractor: TaskListInteractorProtocol {
         self.repository = repository
     }
 
-    func fetchTasks() -> [TaskEntity] {
+    func fetchTasks() -> [Task] {
         repository.getAll()
     }
 
     func addTask(title: String) {
         repository.add(title: title)
     }
-
-    func toggleTask(_ task: TaskEntity) {
-        repository.toggle(task)
+    
+    func toggleTask(id: UUID) {
+        repository.toggle(id: id)
     }
 }

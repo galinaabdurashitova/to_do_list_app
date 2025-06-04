@@ -8,34 +8,51 @@
 import XCTest
 
 final class ToDoListUITests: XCTestCase {
+    var app: XCUIApplication!
 
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
+        app = XCUIApplication()
         app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
 
-    @MainActor
-    func testLaunchPerformance() throws {
-        // This measures how long it takes to launch your application.
-        measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
-        }
+    func testAddingTaskAppearsInList() {
+        let input = app.textFields["NewTaskInput"]
+        XCTAssertTrue(input.exists)
+
+        input.tap()
+        input.typeText("Buy milk")
+
+        app.buttons["AddButton"].tap()
+
+        let taskCell = app.staticTexts["Buy milk"]
+        XCTAssertTrue(taskCell.exists)
+    }
+
+    func testTogglingTaskShowsCheckmark() {
+        let input = app.textFields["NewTaskInput"]
+        XCTAssertTrue(input.exists)
+
+        input.tap()
+        input.typeText("Clean room")
+        app.buttons["AddButton"].tap()
+
+        let cell = app.cells.containing(.staticText, identifier: "Clean room").firstMatch
+        XCTAssertTrue(cell.waitForExistence(timeout: 2))
+
+        let toggleButton = cell.images["Toggle-Clean room-circle"]
+        XCTAssertTrue(toggleButton.exists)
+
+        toggleButton.tap()
+
+        let toggledButton = cell.images["Toggle-Clean room-checkmark"]
+        XCTAssertTrue(toggledButton.waitForExistence(timeout: 2))
+    }
+
+
+    func testAddButtonDoesNothingWhenInputIsEmpty() {
+        app.buttons["AddButton"].tap()
+        let list = app.tables.firstMatch
+        XCTAssertEqual(list.cells.count, 0)
     }
 }

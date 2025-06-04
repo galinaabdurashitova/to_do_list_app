@@ -9,9 +9,9 @@ import Foundation
 import CoreData
 
 protocol TaskRepositoryProtocol {
-    func getAll() -> [TaskEntity]
+    func getAll() -> [Task]
     func add(title: String)
-    func toggle(_ task: TaskEntity)
+    func toggle(id: UUID)
 }
 
 final class TaskRepository: TaskRepositoryProtocol {
@@ -21,21 +21,31 @@ final class TaskRepository: TaskRepositoryProtocol {
         self.container = container
     }
 
-    func getAll() -> [TaskEntity] {
+    func getAll() -> [Task] {
         let request: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
-        return (try? container.viewContext.fetch(request)) ?? []
+        guard let result = try? container.viewContext.fetch(request) else { return [] }
+
+        return result.compactMap { entity in
+            guard let id = entity.id, let title = entity.title else { return nil }
+            return Task(id: id, title: title, isDone: entity.isDone)
+        }
     }
 
     func add(title: String) {
-        let new = TaskEntity(context: container.viewContext)
-        new.id = UUID()
-        new.title = title
-        new.isDone = false
+        let entity = TaskEntity(context: container.viewContext)
+        entity.id = UUID()
+        entity.title = title
+        entity.isDone = false
         try? container.viewContext.save()
     }
 
-    func toggle(_ task: TaskEntity) {
-        task.isDone.toggle()
+    func toggle(id: UUID) {
+        let request: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        guard let result = try? container.viewContext.fetch(request), let entity = result.first else { return }
+
+        entity.isDone.toggle()
         try? container.viewContext.save()
     }
 }
+

@@ -16,22 +16,31 @@ struct TaskListView: View {
             VStack {
                 HStack {
                     TextField("New Task", text: $newTaskTitle)
+                        .accessibilityIdentifier("NewTaskInput")
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     Button("Add") {
                         guard !newTaskTitle.isEmpty else { return }
                         viewModel.addTask(title: newTaskTitle)
                         newTaskTitle = ""
                     }
+                    .accessibilityIdentifier("AddButton")
                 }.padding()
 
-                List(viewModel.tasks, id: \ .id) { task in
+                List(viewModel.tasks, id: \.id) { task in
                     HStack {
-                        Text(task.title ?? "")
+                        Text(task.title)
+                            .accessibilityIdentifier(task.title)
                         Spacer()
-                        Image(systemName: task.isDone ? "checkmark.circle.fill" : "circle")
-                            .onTapGesture {
-                                viewModel.toggleDone(task: task)
-                            }
+                        Image(
+                            systemName: task.isDone
+                                ? "checkmark.circle.fill" : "circle"
+                        )
+                        .accessibilityIdentifier(
+                            "Toggle-\(task.title)-\(task.isDone ? "checkmark" : "circle")"
+                        )
+                        .onTapGesture {
+                            viewModel.toggleDone(id: task.id)
+                        }
                     }
                 }
             }

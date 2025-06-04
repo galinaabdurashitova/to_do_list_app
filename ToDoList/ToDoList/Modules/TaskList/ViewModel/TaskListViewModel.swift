@@ -8,7 +8,7 @@
 import Foundation
 
 final class TaskListViewModel: ObservableObject {
-    @Published var tasks: [TaskEntity] = []
+    @Published var tasks: [Task] = []
 
     private let interactor: TaskListInteractorProtocol
 
@@ -26,8 +26,8 @@ final class TaskListViewModel: ObservableObject {
         fetchTasks()
     }
 
-    func toggleDone(task: TaskEntity) {
-        interactor.toggleTask(task)
+    func toggleDone(id: UUID) {
+        interactor.toggleTask(id: id)
         fetchTasks()
     }
 }
