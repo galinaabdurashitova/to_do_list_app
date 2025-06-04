@@ -5,6 +5,7 @@ A lightweight iOS demo application using:
 - Core Data
 - Clean architecture with VIPER-inspired layers
 - MVVM for View + ViewModel logic separation
+- Unit and UI testing with XCTest
 
 ## 📱 Features
 
@@ -12,6 +13,7 @@ A lightweight iOS demo application using:
 - Mark tasks as complete/incomplete
 - Persist data locally with Core Data
 - VIPER-like modularisation (View, Interactor, Presenter/ViewModel, Entity, Repository)
+- XCTest-based unit and UI test coverage
 
 ## 🚀 Getting Started
 
@@ -26,3 +28,4 @@ This is a minimal yet production-ready app that showcases my ability to:
 - Architect with modular, testable components
 - Persist data with Core Data
 - Write clean and scalable SwiftUI code
+- Implement and maintain both unit and UI tests using XCTest
