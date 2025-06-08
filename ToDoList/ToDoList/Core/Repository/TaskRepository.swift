@@ -12,6 +12,7 @@ protocol TaskRepositoryProtocol {
     func getAll() -> [Task]
     func add(title: String)
     func toggle(id: UUID)
+    func delete(id: UUID)
 }
 
 final class TaskRepository: TaskRepositoryProtocol {
@@ -45,6 +46,18 @@ final class TaskRepository: TaskRepositoryProtocol {
         guard let result = try? container.viewContext.fetch(request), let entity = result.first else { return }
 
         entity.isDone.toggle()
+        try? container.viewContext.save()
+    }
+    
+    func delete(id: UUID) {
+        let request: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+
+        guard let result = try? container.viewContext.fetch(request), let entity = result.first else {
+            return
+        }
+
+        container.viewContext.delete(entity)
         try? container.viewContext.save()
     }
 }

@@ -11,6 +11,7 @@ protocol TaskListInteractorProtocol {
     func fetchTasks() -> [Task]
     func addTask(title: String)
     func toggleTask(id: UUID)
+    func deleteTask(id: UUID)
 }
 
 final class TaskListInteractor: TaskListInteractorProtocol {
@@ -30,5 +31,9 @@ final class TaskListInteractor: TaskListInteractorProtocol {
     
     func toggleTask(id: UUID) {
         repository.toggle(id: id)
+    }
+    
+    func deleteTask(id: UUID) {
+        repository.delete(id: id)
     }
 }

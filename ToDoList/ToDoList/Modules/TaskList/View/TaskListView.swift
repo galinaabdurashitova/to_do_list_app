@@ -89,8 +89,16 @@ struct TaskListView: View {
         if viewModel.tasks.isEmpty {
             emptyState
         } else {
-            List(viewModel.tasks, id: \.id) { task in
-                taskLine(task)
+            List {
+                ForEach(viewModel.tasks, id: \.id) { task in
+                    taskLine(task)
+                }
+                .onDelete { indexSet in
+                    indexSet.forEach { index in
+                        let id = viewModel.tasks[index].id
+                        viewModel.deleteTask(id: id)
+                    }
+                }
             }
         }
     }

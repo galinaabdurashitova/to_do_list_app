@@ -30,4 +30,9 @@ final class TaskListViewModel: ObservableObject {
         interactor.toggleTask(id: id)
         fetchTasks()
     }
+    
+    func deleteTask(id: UUID) {
+        interactor.deleteTask(id: id)
+        fetchTasks()
+    }
 }
