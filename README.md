@@ -9,8 +9,27 @@ A lightweight iOS demo application using:
 
 ## 📱 Features
 
-- Add and view tasks
-- Mark tasks as complete/incomplete
+<table> 
+  <tr> 
+    <td align="center"><strong>Light / Dark Mode</strong></td> 
+    <td align="center"><strong>Animated TextField</strong></td> 
+    <td align="center"><strong>Adding Tasks</strong></td> 
+  </tr> 
+  <tr> 
+    <td><img src="screenshots/1_app_themes.gif" width="180"/></td> 
+    <td><img src="screenshots/2_text_field.gif" width="180"/></td> 
+    <td><img src="screenshots/3_add_task.gif" width="180"/></td> 
+  </tr> 
+  <tr> 
+    <td align="center"><strong>Completing Tasks</strong></td> 
+    <td align="center"><strong>Deleting Tasks</strong></td> 
+  </tr> 
+  <tr> 
+    <td><img src="screenshots/4_complete_tasks.gif" width="180"/></td> 
+    <td><img src="screenshots/5_delete_tasks.gif" width="180"/></td> 
+  </tr> 
+</table>
+
 - Persist data locally with Core Data
 - VIPER-like modularisation (View, Interactor, Presenter/ViewModel, Entity, Repository)
 - XCTest-based unit and UI test coverage
