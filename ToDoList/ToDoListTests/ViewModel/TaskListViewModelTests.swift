@@ -13,6 +13,7 @@ final class TaskListViewModelTests: XCTestCase {
         var tasks: [Task] = []
         var addCalled = false
         var toggleCalledWith: UUID?
+        var deletedID: UUID?
 
         func fetchTasks() -> [Task] {
             return tasks
@@ -32,7 +33,8 @@ final class TaskListViewModelTests: XCTestCase {
         }
         
         func deleteTask(id: UUID) {
-            
+            deletedID = id
+            tasks.removeAll { $0.id == id }
         }
     }
 
@@ -64,5 +66,18 @@ final class TaskListViewModelTests: XCTestCase {
 
         XCTAssertEqual(stub.toggleCalledWith, id)
         XCTAssertTrue(viewModel.tasks.first?.isDone ?? false)
+    }
+    
+    func testDeleteTaskUpdatesTasks() {
+        let id = UUID()
+        let stub = StubInteractor()
+        stub.tasks = [Task(id: id, title: "To Delete", isDone: false)]
+        
+        let viewModel = TaskListViewModel(interactor: stub)
+
+        viewModel.deleteTask(id: id)
+
+        XCTAssertEqual(stub.deletedID, id)
+        XCTAssertTrue(viewModel.tasks.isEmpty)
     }
 }

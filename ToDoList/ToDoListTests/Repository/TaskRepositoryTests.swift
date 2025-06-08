@@ -46,5 +46,21 @@ final class TaskRepositoryTests: XCTestCase {
         let tasks = repository.getAll()
         XCTAssertFalse(tasks.first?.isDone ?? true)
     }
+    
+    func testDeleteRemovesTask() {
+        let container = makeInMemoryContainer()
+        let repository = TaskRepository(container: container)
+
+        repository.add(title: "Delete Me")
+        var tasks = repository.getAll()
+        XCTAssertEqual(tasks.count, 1)
+
+        let id = tasks.first!.id
+        repository.delete(id: id)
+
+        tasks = repository.getAll()
+        XCTAssertEqual(tasks.count, 0)
+    }
+
 }
 

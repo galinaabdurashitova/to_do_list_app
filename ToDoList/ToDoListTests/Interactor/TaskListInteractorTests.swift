@@ -13,6 +13,7 @@ final class TaskListInteractorTests: XCTestCase {
         var tasks: [Task] = []
         var addCalledWith: String?
         var toggleCalledWith: UUID?
+        var deletedID: UUID?
 
         func getAll() -> [Task] {
             return tasks
@@ -32,7 +33,8 @@ final class TaskListInteractorTests: XCTestCase {
         }
         
         func delete(id: UUID) {
-            
+            deletedID = id
+            tasks.removeAll { $0.id == id }
         }
     }
 
@@ -66,5 +68,18 @@ final class TaskListInteractorTests: XCTestCase {
 
         XCTAssertEqual(stub.toggleCalledWith, id)
         XCTAssertTrue(stub.tasks.first?.isDone ?? false)
+    }
+    
+    func testDeleteDelegatesToRepository() {
+        let id = UUID()
+        let stub = StubRepository()
+        stub.tasks = [Task(id: id, title: "Delete Me", isDone: false)]
+        
+        let interactor = TaskListInteractor(repository: stub)
+        
+        interactor.deleteTask(id: id)
+        
+        XCTAssertEqual(stub.deletedID, id)
+        XCTAssertTrue(stub.tasks.isEmpty)
     }
 }
