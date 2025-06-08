@@ -8,145 +8,81 @@
 import SwiftUI
 
 struct TaskListView: View {
+    // MARK: - Properties
     @StateObject var viewModel: TaskListViewModel = TaskListViewModel()
-    @State private var newTaskTitle: String = ""
-    @State private var isTaskTextFieldOpened: Bool = false
-    @FocusState var isFocused
 
+    // MARK: - Body
     var body: some View {
-        ZStack(alignment:
-            isTaskTextFieldOpened ? .bottom : .bottomTrailing
-        ) {
+        ZStack {
             VStack(spacing: 16) {
                 Text("Tasks")
                     .font(.title)
                     .fontWeight(.black)
                     .fontWidth(.expanded)
+                
                 tasksList
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .disabled(isTaskTextFieldOpened)
-            .overlay {
-                if isTaskTextFieldOpened {
-                    Color.black
-                        .opacity(0.2)
-                        .ignoresSafeArea()
-                        .onTapGesture(perform: toggleTextField)
-                }
-            }
             
-            newTaskTextField
+            NewTaskInputView(addTaskAction: viewModel.addTask)
         }
     }
     
-    @ViewBuilder
-    private var newTaskTextField: some View {
-        ZStack {
-            if isTaskTextFieldOpened {
-                textFieldSheetView
-            } else {
-                newTaskButton
-            }
-        }
-        .padding(isTaskTextFieldOpened ? 24 : 16)
-        .ignoresSafeArea()
-        .background(isTaskTextFieldOpened ? Color(.systemGray6) : .accentColor)
-        .customCorner(
-            corners: isTaskTextFieldOpened ? [.topLeft, .topRight] : .allCorners,
-            radius: isTaskTextFieldOpened ? 24 : 60
-        )
-        .padding(isTaskTextFieldOpened ? 0 : 16)
-    }
-    
-    private var newTaskButton: some View {
-        Button(action: toggleTextField) {
-            Image(systemName: "plus")
-                .font(.system(size: 48))
-                .foregroundColor(.white)
-        }
-        .buttonStyle(ScaledButtonStyle())
-    }
-    
-    private var textFieldSheetView: some View {
-        VStack(alignment: .trailing, spacing: 8) {
-            TextField("New Task", text: $newTaskTitle, axis: .vertical)
-                .accessibilityIdentifier("NewTaskInput")
-                .focused($isFocused)
-            Button("Add", action: addTask)
-                .foregroundColor(.white)
-                .fontDesign(.monospaced)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(newTaskTitle.isEmpty ? .gray.opacity(0.4) : .accentColor)
-                .cornerRadius(20)
-                .accessibilityIdentifier("AddButton")
-        }
-    }
+    // MARK: - Subviews
     
     @ViewBuilder
     private var tasksList: some View {
         if viewModel.tasks.isEmpty {
-            emptyState
+            EmptyStateView()
+                .accessibilityIdentifier("EmptyStateTitle")
         } else {
-            List {
-                ForEach(viewModel.tasks, id: \.id) { task in
-                    taskLine(task)
-                }
-                .onDelete { indexSet in
-                    indexSet.forEach { index in
-                        let id = viewModel.tasks[index].id
-                        viewModel.deleteTask(id: id)
+            List(viewModel.tasks, id: \.id) { task in
+                taskLine(task)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            viewModel.deleteTask(id: task.id)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
                     }
-                }
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .accessibilityIdentifier("TaskList")
         }
     }
     
     private func taskLine(_ task: Task) -> some View {
         HStack {
             Text(task.title)
-                .accessibilityIdentifier(task.title)
+                .strikethrough(task.isDone, color: .primary)
+                .opacity(task.isDone ? 0.6 : 1)
+                .accessibilityLabel("TaskTitle-\(task.title)")
             Spacer()
-            Image(
-                systemName: task.isDone
-                ? "checkmark.circle.fill" : "circle"
-            )
-            .accessibilityIdentifier(
-                "Toggle-\(task.title)-\(task.isDone ? "checkmark" : "circle")"
-            )
-            .onTapGesture {
-                viewModel.toggleDone(id: task.id)
+            doneButton(task: task)
+        }
+        .padding(16)
+        .background(task.isDone ? .green.opacity(0.4) : Color(.systemGray6))
+        .cornerRadius(16)
+        .onTapGesture {
+            viewModel.toggleDone(id: task.id)
+        }
+        .accessibilityElement()
+        .accessibilityAddTraits(.isButton)
+        .accessibilityIdentifier("Toggle-\(task.title)-\(task.isDone ? "checkmark" : "circle")")
+    }
+    
+    private func doneButton(task: Task) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color(.systemGray4).opacity(0.8))
+                .frame(width: 24, height: 24)
+            if task.isDone {
+                CustomCheckMark()
             }
         }
-    }
-    
-    private var emptyState: some View {
-        VStack(spacing: 32) {
-            Image(systemName: "sparkles")
-                .font(.system(size: 72))
-                .foregroundColor(.accentColor)
-                .symbolEffect(.breathe.pulse.byLayer, options: .repeat(.continuous))
-            
-            Text("No tasks yet. Add one!")
-                .fontDesign(.monospaced)
-        }
-        .opacity(0.4)
-    }
-    
-    // MARK: - Functions
-    private func toggleTextField() {
-        withAnimation(.bouncy(duration: 0.3)) {
-            isTaskTextFieldOpened.toggle()
-            isFocused = isTaskTextFieldOpened
-        }
-    }
-    
-    private func addTask() {
-        guard !newTaskTitle.isEmpty else { return }
-        viewModel.addTask(title: newTaskTitle)
-        toggleTextField()
-        newTaskTitle = ""
     }
 }
 

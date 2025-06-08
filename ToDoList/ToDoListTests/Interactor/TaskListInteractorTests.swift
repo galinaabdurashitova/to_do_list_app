@@ -30,6 +30,10 @@ final class TaskListInteractorTests: XCTestCase {
                 tasks[i] = Task(id: t.id, title: t.title, isDone: !t.isDone)
             }
         }
+        
+        func delete(id: UUID) {
+            
+        }
     }
 
     func testFetchTasksDelegatesToRepository() {

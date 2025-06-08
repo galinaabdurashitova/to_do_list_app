@@ -30,6 +30,10 @@ final class TaskListViewModelTests: XCTestCase {
                 tasks[index] = Task(id: t.id, title: t.title, isDone: !t.isDone)
             }
         }
+        
+        func deleteTask(id: UUID) {
+            
+        }
     }
 
     func testInitialFetch() {
